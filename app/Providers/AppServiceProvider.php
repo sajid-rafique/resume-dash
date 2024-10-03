@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
+use App\Contracts\ApiResponseInterface;
+use App\Services\ApiResponse;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(ApiResponseInterface::class, ApiResponse::class);
     }
 
     /**
@@ -21,8 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Passport::tokensExpireIn(now()->addDays(15));
-        Passport::refreshTokensExpireIn(now()->addDays(30));
-        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        // Passport::tokensExpireIn(now()->addSeconds(5));
+        // Passport::refreshTokensExpireIn(now()->addSeconds(10));
+        // Passport::personalAccessTokensExpireIn(now()->addSeconds(15));
+        Passport::personalAccessTokensExpireIn(now()->addMinutes(30));
     }
 }

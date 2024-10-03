@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthenticationController extends Controller
@@ -14,23 +12,23 @@ class AuthenticationController extends Controller
     */
     public function login()
     {
-        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            // successfull authentication
-            $user = Auth::user();
-
-            $user_token['token'] = $user->createToken('appToken')->accessToken;
-
-            return response()->json([
-                'success' => true,
-                'token' => $user_token,
-                'user' => Auth::user(),
-            ], 200);
-        } else {
-            // failure to authenticate
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to authenticate.',
-            ], 401);
+        try {
+            if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
+                // successfull authentication
+                $user = Auth::user();
+    
+                $user_token = $user->createToken('appToken')->accessToken;
+    
+                return $this->apiResponse->success([
+                    'token' => $user_token,
+                    'user'  => $user,
+                ]);
+            } else {
+                return $this->apiResponse->error('Failed to authenticate.', 401);
+            }
+            
+        } catch (\Throwable $th) {
+            return $this->apiResponse->error($th->getMessage(), 500);
         }
     }
 }
